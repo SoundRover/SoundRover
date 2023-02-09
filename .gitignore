@@ -1,0 +1,11 @@
+# stores Spotify user credentials
+cred.py
+
+# Project dependencies
+frontend/node_modules/
+
+# Python environment
+env/
+
+# Extra stuff
+.DS_Store
