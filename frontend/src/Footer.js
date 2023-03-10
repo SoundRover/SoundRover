@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
@@ -19,7 +19,6 @@ import SearchIcon from '@material-ui/icons/Search';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import { useMediaQuery } from '@material-ui/core';
 
-const spotify = new SpotifyWebApi();
 
 const ColoredSlider = withStyles({
     root: {
@@ -28,13 +27,42 @@ const ColoredSlider = withStyles({
   })(Slider);
 
 function Footer() {
-    const isMobile = useMediaQuery('(max-width:600px)');
-
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isSmartphoneAvailable, setIsSmartphoneAvailable] = useState(true);
-
     // Get the Spotify API object
     const [{ spotify }, dispatch] = useDataLayerValue();
+
+    const isMobile = useMediaQuery('(max-width:600px)');
+    
+    // State Variables
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isSmartphoneAvailable, setIsSmartphoneAvailable] = useState(true);
+    const [currentTrack, setCurrentTrack] = useState(null);
+
+    // GET CURRENT PLAYING TRACK: OPTION 1
+    // Get the current playing track when play/pause or skip is pressed
+    // useEffect(() => {
+    //     spotify.getMyCurrentPlayingTrack().then((response) => {
+    //       setCurrentTrack(response.item);
+    //     });
+    //   }, [isPlaying, spotify]); 
+      // TODO: Get the current track whenever 'skip' buttons are pressed
+      // TODO: Move this functionality to the handleClick functions
+      // TODO: Change the song once the time is up!
+
+
+    // GET CURRENT PLAYING TRACK: OPTION 2
+    // Alternately, we can query the Spotify API continuously but this is a lot of API requests
+    // Get the current playing track once every second
+    useEffect(() => {
+        // Set up a timer to query the Spotify API every second
+        const interval = setInterval(() => {
+          spotify.getMyCurrentPlayingTrack().then((response) => {
+            setCurrentTrack(response.item);
+          });
+        }, 1000);
+    
+        // Clear timer when the component unmounts
+        return () => clearInterval(interval);
+      }, []);
 
     // Event handler for clicking the play/pause button
     const handlePlayPauseClick = async () => {
@@ -77,13 +105,15 @@ function Footer() {
     return (
         <div className="footer">
             <div className="footer__left">
-                <img className="footer__albumLogo" src="https://i1.sndcdn.com/artworks-UxM4BbNJZUXB-0-t500x500.jpg"
-                    alt="" />
+            {currentTrack && (
+                <>
+                <img className="footer__albumLogo" src={currentTrack.album.images[0].url} alt="Album cover" />
                 <div className="footer__songInfo">
-                    <h4>Jalebi Baby</h4>
-                    <p>Tesher</p>
-
+                    <h4>{currentTrack.name}</h4>
+                    <p>{currentTrack.artists[0].name}</p>
                 </div>
+                </>
+            )}
             </div>
 
             <div className="footer__center">
