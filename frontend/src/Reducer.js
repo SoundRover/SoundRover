@@ -31,10 +31,10 @@ const reducer = (state, action) => {
         item: action.item,
       };
 
-    case "SET_DISCOVER_WEEKLY":
+    case "SET_SELECTED_MUSIC":
       return {
         ...state,
-        discover_weekly: action.discover_weekly,
+        selected_music: action.selected_music,
       };
 
     case "SET_TOP_ARTISTS":

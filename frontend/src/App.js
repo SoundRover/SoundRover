@@ -55,10 +55,10 @@ function App() {
         });
       });
 
-      spotify.getPlaylist('0hbMSLbsYCf7yiiFN9VN4R').then((Response) => 
+      spotify.getPlaylist('0hbMSLbsYCf7yiiFN9VN4R').then((response) => 
         dispatch({
-          type: "SET_DISCOVER_WEEKLY",
-          discover_weekly: Response
+          type: "SET_SELECTED_MUSIC",
+          selected_music: response
         })
       );
                   
