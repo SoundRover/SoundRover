@@ -19,8 +19,8 @@ function SidebarOption({ title, Icon, id }) {
             // Update the selected playlist
             spotify.getPlaylist(id).then(response => 
                 dispatch({
-                  type: "SET_DISCOVER_WEEKLY",
-                  discover_weekly: response
+                  type: "SET_SELECTED_MUSIC",
+                  selected_music: response
                 })
               );
         }
