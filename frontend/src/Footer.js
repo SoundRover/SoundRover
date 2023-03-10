@@ -8,8 +8,28 @@ import VolumeDownIcon from "@material-ui/icons/VolumeDown";
 import PlaylistPlayIcon from "@material-ui/icons/PlaylistPlay";
 import './Footer.css';
 import { Grid, Slider } from '@material-ui/core';
+import { useDataLayerValue } from './DataLayer';
+import SpotifyWebApi from "spotify-web-api-js";
+
+const spotify = new SpotifyWebApi();
 
 function Footer() {
+
+    // Get the Spotify API object
+    const [{ spotify }, dispatch] = useDataLayerValue();
+
+    // Event handler for clicking the play/pause button
+    const handlePlayPauseClick = async () => {
+        
+        // Print out list of Spotify devices
+        spotify.getMyDevices().then(response =>
+            console.log("My Devices: ", response)
+        );
+
+        // TODO: CHANGE THIS TO INCLUDE PLAY/PAUSE LOGIC
+        spotify.play(); 
+    };
+
     return (
         <div className="footer">
             <div className="footer__left">
@@ -25,7 +45,7 @@ function Footer() {
             <div className="footer__center">
                 <ShuffleIcon className="footer__green" />
                 <SkipPreviousIcon className="footer__icon" />
-                <PlayCircleOutlineIcon fontSize="large" className="footer__icon" />
+                <PlayCircleOutlineIcon fontSize="large" className="footer__icon" onClick={handlePlayPauseClick}/>
                 <SkipNextIcon className="footer__icon" />
                 <RepeatIcon className="footer__green" />
             </div>

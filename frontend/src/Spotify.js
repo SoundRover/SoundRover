@@ -2,7 +2,8 @@
 
 export const authEndpoint = "https://accounts.spotify.com/authorize";
 
-const clientId = "d677d681fcd54e3cad4593a57a8d2359"
+// Client ID is 'Sound Rover' App on Benny's Spotify Developer account
+const clientId = "b176c89eb06a4faebc76fafc5dda1dca"
 const redirectUri = "http://localhost:3000/";
 const scopes = [
     "user-read-currently-playing",
