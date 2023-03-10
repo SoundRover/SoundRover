@@ -3,7 +3,21 @@
     flex-direction: column;
 }
   
-  .player__body {
+.player__body {
     display: flex;
     flex-grow: 1;
+    max-height: 90vh;
 }
+
+@media (min-width: 768px) {
+    .player__body {
+        display: flex;
+        flex-grow: 1;
+        max-height: 90vh;
+    }
+  
+    .sidebar {
+      order: 2;
+      flex: 0.2;
+    }
+  }

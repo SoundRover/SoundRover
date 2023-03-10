@@ -6,7 +6,7 @@
 }
   
 .login > img {
-    height: 200px;
+    height: 500px;
 }
   
 .login > a {
@@ -15,5 +15,5 @@
     padding: 20px;
     border-radius: 99px;
     font-weight: 800;
-    background-color: #1db954;
+    background-color: #e87121;
 }
