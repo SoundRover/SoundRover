@@ -27,3 +27,7 @@
 .header__right > h4 {
     margin-left: 10px;
 }
+
+.dropdown > ul > li {
+    list-style: none;
+}
