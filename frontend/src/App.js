@@ -55,12 +55,28 @@ function App() {
         });
       });
 
-      spotify.getPlaylist('0hbMSLbsYCf7yiiFN9VN4R').then((response) => 
+      spotify.getPlaylist('0hbMSLbsYCf7yiiFN9VN4R').then((response) => {
         dispatch({
           type: "SET_SELECTED_MUSIC",
           selected_music: response
-        })
-      );
+        });
+      });
+
+      spotify.getMyCurrentPlaybackState().then((playerState) => {
+        dispatch({
+          type: "SET_PLAYING",
+          isPlaying: playerState?.is_playing
+        });
+        dispatch({
+          type: "SET_SHUFFLE",
+          isShuffling: playerState?.shuffle_state
+        });
+        console.log("INITIAL REPEAT STATE: ", playerState?.repeat_state)
+        dispatch({
+          type: "SET_REPEAT",
+          repeatMode: playerState?.repeat_state
+        });
+      });
                   
       dispatch({
         type: "SET_SPOTIFY",
