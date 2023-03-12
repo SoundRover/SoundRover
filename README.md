@@ -17,3 +17,9 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
 - No longer need to start playing a song on spotify app for play/pause to work-- just need the app open
 - Added prompt to open spotify app on phone if not already open
 - Removed sidebar on mobile, added bottom navbar instead
+## v1.2 changelog
+- Shuffle, skip, repeat buttons work
+- Fixed play/pause to reflect spotify play/pause state
+## v1.3 changelog
+- Added Song fact cards and expandable footer
+- Added OpenAI API calls to generate a single song fact
