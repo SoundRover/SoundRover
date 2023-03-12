@@ -37,11 +37,10 @@ const ColoredSlider = withStyles({
 function Footer() {
     // State Variables
     const [isSmartphoneAvailable, setIsSmartphoneAvailable] = useState(true);
-    const [expanded, setExpanded] = useState(false);
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
 
-    // Get the Spotify API object
-    const [{ spotify, currentTrack, isPlaying, isShuffling, repeatMode }, dispatch] = useDataLayerValue();
+    // Get global variables
+    const [{ spotify, currentTrack, isPlaying, isShuffling, repeatMode, factsExpanded, factsLoading }, dispatch] = useDataLayerValue();
     const isMobile = useMediaQuery('(max-width:600px)');
 
     // OpenAI API
@@ -56,24 +55,24 @@ function Footer() {
     });
 
     const getRes = () => {
-        if (expanded) {
-            setLoading(true);
+        if (factsExpanded) {
+            dispatch({ type: "SET_FACTS_LOADING", factsLoading: true});
             axios({
-            method: "POST",
-            url: "https://api.openai.com/v1/completions",
-            data: payload,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization:
-                "Bearer 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"
-            }
+                method: "POST",
+                url: "https://api.openai.com/v1/completions",
+                data: payload,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization:
+                    "Bearer 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"
+                }
             })
             .then((res) => {
                 console.log("OPEN AI RESPONSE: ",res);
                 responseHandler(res);
             })
             .catch((e) => {
-                setLoading(false);
+                dispatch({ type: "SET_FACTS_LOADING", factsLoading: false});
                 console.log(e.message, e);
             });
         }
@@ -83,15 +82,14 @@ function Footer() {
     const responseHandler = (res) => {
         if (res.status === 200) {
             setObj(res.data);
-            setLoading(false);
+            dispatch({ type: "SET_FACTS_LOADING", factsLoading: false});
         }
     };
     
     // Handler for expanding the footer
     const handleFooterExpand = () => {
-        console.log("expand");
         getRes();
-        setExpanded(!expanded);
+        dispatch({ type: "SET_FACTS_EXPANDED", factsExpanded: !factsExpanded});
     };
 
     // Get the current playing track once every second
@@ -219,13 +217,13 @@ function Footer() {
       };
 
     return (
-        <div className={`footer ${expanded ? 'expanded' : ''}`}>
-            {expanded && (
+        <div className={`footer ${factsExpanded ? 'factsExpanded' : ''}`}>
+            {factsExpanded && (
                 <div className="footer__boxContainer">
                     <div className="fact-box">
                         <div className="fact-box-content">
                             <ArrowCircleLeftIcon fontSize="large" className="left-fact-arrow"/>
-                            <p className="fact-box-text">{loading ? (
+                            <p className="fact-box-text">{factsLoading ? (
                             <span>loading...</span>
                         ) : (
                             obj?.choices?.map((v, i) => <div>{v.text}</div>)

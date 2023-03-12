@@ -152,7 +152,7 @@
         align-items: center;
     }
 
-    .footer.expanded {
+    .footer.factsExpanded {
         height: 100vh;
         max-height: 100vh;
         transition: height 1s ease-in-out;
