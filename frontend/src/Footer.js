@@ -30,12 +30,12 @@ const ColoredSlider = withStyles({
 
 function Footer() {
     // Get the Spotify API object
-    const [{ spotify, isShuffling, repeatMode }, dispatch] = useDataLayerValue();
+    const [{ spotify, isPlaying, isShuffling, repeatMode }, dispatch] = useDataLayerValue();
 
     const isMobile = useMediaQuery('(max-width:600px)');
     
     // State Variables
-    const [isPlaying, setIsPlaying] = useState(false);
+    // const [isPlaying, setIsPlaying] = useState(false);
     const [isSmartphoneAvailable, setIsSmartphoneAvailable] = useState(true);
     const [currentTrack, setCurrentTrack] = useState(null);
 
@@ -64,7 +64,7 @@ function Footer() {
 
         // Play/Pause logic
         if (playerState?.is_playing) {
-            setIsPlaying(false);
+            dispatch({ type: "SET_PLAYING", isPlaying: false});
             spotify.pause();
         } else {
             spotify.getMyDevices().then(response => {
@@ -74,7 +74,7 @@ function Footer() {
                 // If a smartphone device was found, transfer playback to it.
                 if (smartphoneDevice) {
                     spotify.transferMyPlayback([smartphoneDevice.id], { play: true });
-                    setIsPlaying(true);
+                    dispatch({ type: "SET_PLAYING", isPlaying: true});
                     setIsSmartphoneAvailable(true);
                     console.log("Playback transferred to smartphone device:", smartphoneDevice);
                 } else {
