@@ -25,3 +25,5 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
 - Added OpenAI API calls to generate a single song fact
 ## v1.3.1 changelog
 - Fixes for factbox
+## v.1.3.2 changelog
+- added package and package-lock json files for above two versions
