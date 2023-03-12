@@ -23,3 +23,5 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
 ## v1.3 changelog
 - Added Song fact cards and expandable footer
 - Added OpenAI API calls to generate a single song fact
+## v1.3.1 changelog
+- Fixes for factbox

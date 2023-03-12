@@ -1,0 +1,38 @@
+.fact-box {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #944816;
+    border-radius: 10px;
+}
+
+.fact-box-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 9;
+}
+  
+.left-fact-arrow {
+    margin-right: 10px;
+    margin-left: 10px;
+    color: white;
+}
+
+.right-fact-arrow {
+    margin-right: 10px;
+    margin-left: 10px;
+    color: white;
+}
+
+.fact-box-text {
+    font-size: 1.5em;
+    color: white;
+}
+
+.fact-box-circle-icon {
+    transform: scale(0.5);
+}

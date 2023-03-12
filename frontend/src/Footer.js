@@ -21,11 +21,12 @@ import SearchIcon from '@material-ui/icons/Search';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import { useMediaQuery } from '@material-ui/core';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
-import FactBox from './FactBox.js';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import CircleIcon from '@mui/icons-material/Circle';
 import axios from 'axios';
+import './FactBox.js';
+import './FactBox.css';
 
 const ColoredSlider = withStyles({
     root: {
