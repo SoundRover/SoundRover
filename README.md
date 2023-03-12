@@ -27,3 +27,5 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
 - Fixes for factbox
 ## v.1.3.2 changelog
 - added package and package-lock json files for above two versions
+## v.1.3.3 changelog
+- Implemented currentTrack as a global variable so it is usable in other components (like Factbox)

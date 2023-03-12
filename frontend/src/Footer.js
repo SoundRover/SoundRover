@@ -36,14 +36,12 @@ const ColoredSlider = withStyles({
 
 function Footer() {
     // State Variables
-    // const [isPlaying, setIsPlaying] = useState(false);
     const [isSmartphoneAvailable, setIsSmartphoneAvailable] = useState(true);
-    const [currentTrack, setCurrentTrack] = useState(null);
     const [expanded, setExpanded] = useState(false);
     const [loading, setLoading] = useState(false);
 
     // Get the Spotify API object
-    const [{ spotify, isPlaying, isShuffling, repeatMode }, dispatch] = useDataLayerValue();
+    const [{ spotify, currentTrack, isPlaying, isShuffling, repeatMode }, dispatch] = useDataLayerValue();
     const isMobile = useMediaQuery('(max-width:600px)');
 
     // OpenAI API
@@ -71,7 +69,7 @@ function Footer() {
             }
             })
             .then((res) => {
-                console.log(res);
+                console.log("OPEN AI RESPONSE: ",res);
                 responseHandler(res);
             })
             .catch((e) => {
@@ -101,7 +99,10 @@ function Footer() {
         // Set up a timer to query the Spotify API every second
         const interval = setInterval(() => {
           spotify.getMyCurrentPlayingTrack().then((response) => {
-            setCurrentTrack(response.item);
+            dispatch({
+                type: "SET_CURRENT_TRACK",
+                currentTrack: response.item
+              });
             setPayLoad({
                 ...payload,
                 prompt:`Please write an interesting fact about the song ${response.item.name}.`
