@@ -77,6 +77,13 @@ function App() {
           repeatMode: playerState?.repeat_state
         });
       });
+
+      spotify.getMyCurrentPlayingTrack().then((response) => {
+        dispatch({
+          type: "SET_CURRENT_TRACK",
+          isPlaying: response.item
+        });
+      });
                   
       dispatch({
         type: "SET_SPOTIFY",
