@@ -37,6 +37,7 @@ const ColoredSlider = withStyles({
 function Footer() {
     // State Variables
     const [isSmartphoneAvailable, setIsSmartphoneAvailable] = useState(true);
+    const [visibleIndex, setVisibleIndex] = useState(0);
     // const [loading, setLoading] = useState(false);
 
     // Get global variables
@@ -46,12 +47,13 @@ function Footer() {
     // OpenAI API
     let [obj, setObj] = useState({ choices: [] });
     const [payload, setPayLoad] = useState({
-        prompt: currentTrack ? `Please write a fact about the lyrics of the song ${currentTrack.name} by ${currentTrack.artists[0].name} in 200 characters or less.` : 'Please write the text "Loading..."',
+        prompt: currentTrack ? `Please write four facts about the song ${currentTrack.name} by ${currentTrack.artists[0].name}, with each fact being 200 characters or less.
+        Separate each fact with the characters <&&>` : 'Please write the text "Loading..."',
 
         temperature: 0.5,
         n: 1,
         model: "text-davinci-003", 
-        max_tokens: 200
+        max_tokens: 400
     });
 
     const getRes = () => {
@@ -81,7 +83,14 @@ function Footer() {
 
     const responseHandler = (res) => {
         if (res.status === 200) {
-            setObj(res.data);
+            const pieces = res.data.choices[0].text.split("<&&>");
+
+            const result = {
+                choices: pieces
+            };
+
+            setObj(result);
+            console.log("OBJ: ", obj);
             dispatch({ type: "SET_FACTS_LOADING", factsLoading: false});
         }
     };
@@ -103,7 +112,8 @@ function Footer() {
               });
             setPayLoad({
                 ...payload,
-                prompt:`Please write an interesting fact about the song ${response.item.name}.`
+                prompt:`Please write four facts about the song ${response.item.name} by ${response.item.artists[0].name}, with each fact being 200 characters or less.
+                Separate each fact with the characters <&&>`
             });
           });
         }, 1000);
@@ -149,6 +159,21 @@ function Footer() {
             });
         }
     };
+
+    // Create divs for facts
+    const factDivs = obj.choices.map((fact, index) => (
+        <div key={index} style={{ display: index === visibleIndex ? 'block' : 'none' }}>
+            {fact}
+        </div>
+    ));
+
+    const nextFact = async () => {
+        setVisibleIndex((visibleIndex + 1) % obj.choices.length);
+    }
+
+    const prevFact = async () => {
+        setVisibleIndex((visibleIndex - 1) % obj.choices.length);
+    }
 
     // Event handler for Skip Next Button
     const handleSkipNext = async () => {
@@ -222,13 +247,15 @@ function Footer() {
                 <div className="footer__boxContainer">
                     <div className="fact-box">
                         <div className="fact-box-content">
-                            <ArrowCircleLeftIcon fontSize="large" className="left-fact-arrow"/>
-                            <p className="fact-box-text">{factsLoading ? (
-                            <span>loading...</span>
+                            <ArrowCircleLeftIcon fontSize="large" className="left-fact-arrow" onClick={prevFact}/>
+                            <div className="fact-box-text">{factsLoading ? (
+                            <span>Loading...</span>
                         ) : (
-                            obj?.choices?.map((v, i) => <div>{v.text}</div>)
-                        )}</p>
-                            <ArrowCircleRightIcon fontSize="large" className="right-fact-arrow"/>
+                            <>
+                            {factDivs}
+                            </>
+                        )}</div>
+                            <ArrowCircleRightIcon fontSize="large" className="right-fact-arrow" onClick={nextFact}/>
                         </div>
                         <div className="fact-box-pagination">
                             <CircleIcon className="fact-box-circle-icon"/>
