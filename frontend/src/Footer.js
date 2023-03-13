@@ -27,6 +27,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import axios from 'axios';
 import './FactBox.js';
 import './FactBox.css';
+import geniusLogo from './assets/genius.png';
 
 const ColoredSlider = withStyles({
     root: {
@@ -38,6 +39,7 @@ function Footer() {
     // State Variables
     const [isSmartphoneAvailable, setIsSmartphoneAvailable] = useState(true);
     const [visibleIndex, setVisibleIndex] = useState(0);
+    const [factsOrLyrics, setFactsOrLyrics] = useState(false);
     // const [loading, setLoading] = useState(false);
 
     // Get global variables
@@ -56,32 +58,34 @@ function Footer() {
         max_tokens: 400
     });
 
-    const getRes = () => {
+    useEffect(() => {
+        const getRes = async () => {
+                dispatch({ type: "SET_FACTS_LOADING", factsLoading: true});
+                axios({
+                    method: "POST",
+                    url: "https://api.openai.com/v1/completions",
+                    data: payload,
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization:
+                        "Bearer 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"
+                    }
+                })
+                .then((res) => {
+                    console.log("OPEN AI RESPONSE: ",res);
+                    responseHandler(res);
+                })
+                .catch((e) => {
+                    dispatch({ type: "SET_FACTS_LOADING", factsLoading: false});
+                    console.log(e.message, e);
+                });
+        };
         if (factsExpanded) {
-            dispatch({ type: "SET_FACTS_LOADING", factsLoading: true});
-            axios({
-                method: "POST",
-                url: "https://api.openai.com/v1/completions",
-                data: payload,
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization:
-                    "Bearer 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"
-                }
-            })
-            .then((res) => {
-                console.log("OPEN AI RESPONSE: ",res);
-                responseHandler(res);
-            })
-            .catch((e) => {
-                dispatch({ type: "SET_FACTS_LOADING", factsLoading: false});
-                console.log(e.message, e);
-            });
+            getRes();
         }
-        
-    };
+    }, [factsExpanded]);
 
-    const responseHandler = (res) => {
+    function responseHandler(res) {
         if (res.status === 200) {
             const pieces = res.data.choices[0].text.split("<&&>");
 
@@ -90,14 +94,12 @@ function Footer() {
             };
 
             setObj(result);
-            console.log("OBJ: ", obj);
-            dispatch({ type: "SET_FACTS_LOADING", factsLoading: false});
+            dispatch({ type: "SET_FACTS_LOADING", factsLoading: false });
         }
-    };
+    }
     
     // Handler for expanding the footer
     const handleFooterExpand = () => {
-        getRes();
         dispatch({ type: "SET_FACTS_EXPANDED", factsExpanded: !factsExpanded});
     };
 
@@ -108,11 +110,11 @@ function Footer() {
           spotify.getMyCurrentPlayingTrack().then((response) => {
             dispatch({
                 type: "SET_CURRENT_TRACK",
-                currentTrack: response.item
+                currentTrack: response?.item
               });
             setPayLoad({
                 ...payload,
-                prompt:`Please write four facts about the song ${response.item.name} by ${response.item.artists[0].name}, with each fact being 200 characters or less.
+                prompt:`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less.
                 Separate each fact with the characters <&&>`
             });
           });
@@ -165,6 +167,10 @@ function Footer() {
         <div key={index} style={{ display: index === visibleIndex ? 'block' : 'none' }}>
             {fact}
         </div>
+    ));
+
+    const pageCircleIcons = [0, 1, 2, 3].map((fact, index) => (
+        <CircleIcon className="fact-box-circle-icon" key={index} style={{ color: index === visibleIndex ? 'white' : 'black' }}/>
     ));
 
     const nextFact = async () => {
@@ -241,30 +247,104 @@ function Footer() {
         else {return <RepeatIcon onClick={toggleRepeat} />;}
       };
 
+    // Switch between lyrics and song facts
+    const footerSwitch = (currentState) => {
+        if (factsOrLyrics !== currentState) {
+            setFactsOrLyrics(!factsOrLyrics);
+        }
+    };
+
+    
+    const [lyrics, setLyrics] = useState('');
+
+    useEffect(() => {
+        if (factsOrLyrics) {
+            const fetchLyrics = async () => {
+                const options = {
+                    method: 'GET',
+                    url: 'https://genius-song-lyrics1.p.rapidapi.com/search/',
+                    params: {q: `${currentTrack?.name} ${currentTrack?.artists[0].name}`, per_page: '1', page: '1'},
+                    headers: {
+                        'X-RapidAPI-Key': '1c69ecda8amsh7607b507f1581f0p19e57ajsn4f6ddcfe3dce',
+                        'X-RapidAPI-Host': 'genius-song-lyrics1.p.rapidapi.com'
+                    }
+                };
+
+                console.log(options.params);
+
+                let songID = "";
+                let options2 = null;
+
+                axios.request(options).then(function (response1) {
+                    songID = response1.data.hits[0].result.id;
+                    console.log("Response1: ", response1.data);
+                    options2 = {
+                        method: 'GET',
+                        url: 'https://genius-song-lyrics1.p.rapidapi.com/song/lyrics/',
+                        params: {id: songID, text_format: 'plain'},
+                        headers: {
+                        'X-RapidAPI-Key': '1c69ecda8amsh7607b507f1581f0p19e57ajsn4f6ddcfe3dce',
+                        'X-RapidAPI-Host': 'genius-song-lyrics1.p.rapidapi.com'
+                        }
+                    };
+
+                    return axios.request(options2);
+                }).then(function (response2) {
+                    console.log("Response2: ", response2.data);
+                    setLyrics(response2.data.lyrics.lyrics.body.plain.replace(/\n/g, '<br>'));
+                }).catch(function (error) {
+                    console.error(error);
+                });
+
+                console.log("OPTIONS2: ", options2);
+            };
+        
+            fetchLyrics();
+        }
+    }, [factsOrLyrics]);
+
     return (
         <div className={`footer ${factsExpanded ? 'factsExpanded' : ''}`}>
             {factsExpanded && (
-                <div className="footer__boxContainer">
-                    <div className="fact-box">
-                        <div className="fact-box-content">
-                            <ArrowCircleLeftIcon fontSize="large" className="left-fact-arrow" onClick={prevFact}/>
-                            <div className="fact-box-text">{factsLoading ? (
-                            <span>Loading...</span>
-                        ) : (
-                            <>
-                            {factDivs}
-                            </>
-                        )}</div>
-                            <ArrowCircleRightIcon fontSize="large" className="right-fact-arrow" onClick={nextFact}/>
-                        </div>
-                        <div className="fact-box-pagination">
-                            <CircleIcon className="fact-box-circle-icon"/>
-                            <CircleIcon className="fact-box-circle-icon"/>
-                            <CircleIcon className="fact-box-circle-icon"/>
-                            <CircleIcon className="fact-box-circle-icon"/>
-                        </div>
+                <>
+                <div className="footer__switch">
+                    <div className="footer__switchLeft" onClick={footerSwitch.bind(this, true)}
+                    style={{ backgroundColor: factsOrLyrics ? '#944816' : '#e87121' }}>
+                    <img src={geniusLogo} alt="" />
+                    Lyrics
+                    </div>
+                    <div className="footer__switchRight" onClick={footerSwitch.bind(this, false)}
+                    style={{ backgroundColor: factsOrLyrics ? '#e87121' : '#944816' }}>
+                    Song Facts
                     </div>
                 </div>
+                <div className="footer__boxContainer">
+                    <div className="fact-box">
+                        {factsOrLyrics ? (
+                            <div className="footer__lyricsBox" dangerouslySetInnerHTML={{ __html: lyrics }}>
+                            </div>
+                        ) : (
+                        <>
+                        <div className="fact-box-content">
+                            <ArrowCircleLeftIcon fontSize="large" className="left-fact-arrow" onClick={prevFact} />
+                            <div className="fact-box-text">{factsLoading ? (
+                                <span>Loading...</span>
+                            ) : (
+                                <>
+                                    {factDivs}
+                                </>
+                            )}</div>
+                            <ArrowCircleRightIcon fontSize="large" className="right-fact-arrow" onClick={nextFact} />
+                        </div>
+                        <div className="fact-box-pagination">
+                            {pageCircleIcons}
+                        </div>
+                        </>
+                        )}
+                        
+                    </div>
+                </div>
+                </>
             )}
             <div className="footer__left">
             {currentTrack && (

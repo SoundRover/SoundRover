@@ -33,3 +33,8 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
 ## v1.4
 - Factbox now allows for 4 facts to be displayed
 - Buttons on factbox allow you to seek through different facts
+## v.1.5
+- Songs now playback by tapping them (on mobile) or double-clicking them (on desktop)
+## v1.6
+- Genius lyrics integration
+- Fixed OpenAI API loading issue
