@@ -30,3 +30,6 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
 ## v.1.3.3 changelog
 - Implemented currentTrack as a global variable so it is usable in other components (like Factbox)
 - Implemented factsExpanded and factsLoading as globals
+## v1.4
+- Factbox now allows for 4 facts to be displayed
+- Buttons on factbox allow you to seek through different facts
