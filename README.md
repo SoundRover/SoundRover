@@ -30,3 +30,5 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
 ## v.1.3.3 changelog
 - Implemented currentTrack as a global variable so it is usable in other components (like Factbox)
 - Implemented factsExpanded and factsLoading as globals
+## v.1.4 changelog
+- Songs now playback by tapping them (on mobile) or double-clicking them (on desktop)
