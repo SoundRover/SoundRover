@@ -78,7 +78,7 @@ function Header() {
             </div>
 
             <div className="header__right" onClick={toggleMenu}>
-                <Avatar src={user?.images[0].url} alt={user?.display_name} />
+                <Avatar src={user?.images[0] && user?.images[0].url} alt={user?.display_name} />
                 <h4>{user?.display_name}</h4>
                 {showMenu && (
                     <div className="dropdown">
