@@ -31,3 +31,49 @@
 .dropdown > ul > li {
     list-style: none;
 }
+
+.header__searchResults {
+    position: absolute;
+    top: 15vh;
+    left: 0;
+    right: 0;
+    max-height: calc(85vh - 80px);
+    overflow-y: scroll;
+    background-color: white;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+  }
+  
+  .header__searchResult {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .header__searchResult:hover {
+    background-color: #f2f2f2;
+  }
+  
+  .header__searchResult > img {
+    height: 40px;
+    width: 40px;
+    margin-right: 10px;
+    object-fit: contain;
+  }
+  
+  .header__searchResult > div {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .header__searchResult > div > h4 {
+    margin: 0;
+  }
+  
+  .header__searchResult > div > p {
+    margin: 0;
+    font-size: 14px;
+    color: gray;
+  }
