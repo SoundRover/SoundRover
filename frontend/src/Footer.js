@@ -1,4 +1,7 @@
+// React and third-party libraries
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Slider, withStyles, useMediaQuery } from '@material-ui/core';
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
@@ -10,24 +13,23 @@ import RepeatOnIcon from '@mui/icons-material/RepeatOn';
 import RepeatOneOnIcon from '@mui/icons-material/RepeatOneOn';
 import VolumeDownIcon from "@material-ui/icons/VolumeDown";
 import VolumeUpIcon from "@material-ui/icons/VolumeUp";
-import PlaylistPlayIcon from "@material-ui/icons/PlaylistPlay";
-import './Footer.css';
-import { Slider } from '@material-ui/core';
-import { useDataLayerValue } from './DataLayer';
-import { withStyles } from '@material-ui/core/styles';
-import SidebarOption from './SidebarOption';
 import HomeIcon from '@material-ui/icons/Home';
 import SearchIcon from '@material-ui/icons/Search';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
-import { useMediaQuery } from '@material-ui/core';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import CircleIcon from '@mui/icons-material/Circle';
-import axios from 'axios';
+
+// Local components and assets
+import './Footer.css';
+import { useDataLayerValue } from './DataLayer';
+import SidebarOption from './SidebarOption';
 import './FactBox.js';
 import './FactBox.css';
 import geniusLogo from './assets/genius.png';
+import FactBox from './FactBox.js';
+
 
 const ColoredSlider = withStyles({
     root: {
@@ -36,18 +38,18 @@ const ColoredSlider = withStyles({
   })(Slider);
 
 function Footer() {
-    // State Variables
+    ////////////  VARIABLES & OBJECTS  ////////////
     const [isSmartphoneAvailable, setIsSmartphoneAvailable] = useState(true);
     const [visibleIndex, setVisibleIndex] = useState(0);
     const [factsOrLyrics, setFactsOrLyrics] = useState(false);
-    // const [loading, setLoading] = useState(false);
-
-    // Get global variables
+    const [lyrics, setLyrics] = useState('');
     const [{ spotify, currentTrack, isPlaying, isShuffling, repeatMode, factsExpanded, factsLoading }, dispatch] = useDataLayerValue();
     const isMobile = useMediaQuery('(max-width:600px)');
 
-    // OpenAI API
-    let [obj, setObj] = useState({ choices: [] });
+    // Facts are stored as an array of strings
+    let [facts, setFacts] = useState({ choices: [] });
+
+    // Payload to send to OpenAI in request
     const [payload, setPayLoad] = useState({
         prompt: currentTrack ? `Please write four facts about the song ${currentTrack.name} by ${currentTrack.artists[0].name}, with each fact being 200 characters or less.
         Separate each fact with the characters <&&>` : 'Please write the text "Loading..."',
@@ -58,71 +60,122 @@ function Footer() {
         max_tokens: 400
     });
 
-    useEffect(() => {
-        const getRes = async () => {
-                dispatch({ type: "SET_FACTS_LOADING", factsLoading: true});
-                axios({
-                    method: "POST",
-                    url: "https://api.openai.com/v1/completions",
-                    data: payload,
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization:
-                        "Bearer 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"
-                    }
-                })
-                .then((res) => {
-                    console.log("OPEN AI RESPONSE: ",res);
-                    responseHandler(res);
-                })
-                .catch((e) => {
-                    dispatch({ type: "SET_FACTS_LOADING", factsLoading: false});
-                    console.log(e.message, e);
-                });
-        };
-        if (factsExpanded) {
-            getRes();
-        }
-    }, [factsExpanded]);
-
-    function responseHandler(res) {
-        if (res.status === 200) {
-            const pieces = res.data.choices[0].text.split("<&&>");
-
-            const result = {
-                choices: pieces
-            };
-
-            setObj(result);
-            dispatch({ type: "SET_FACTS_LOADING", factsLoading: false });
-        }
-    }
+    // Create divs for facts
+    const factDivs = facts.choices.map((fact, index) => (
+        <div key={index} style={{ display: index === visibleIndex ? 'block' : 'none' }}>
+            {fact}
+        </div>
+    ));
     
+    // Icons to indicate which fact is visible
+    const pageCircleIcons = [0, 1, 2, 3].map((fact, index) => (
+        <CircleIcon className="fact-box-circle-icon" key={index} style={{ color: index === visibleIndex ? 'white' : 'black' }}/>
+    ));
+        
+    ////////////  GENERAL DISPLAY FUNCTIONS  ////////////
+
     // Handler for expanding the footer
     const handleFooterExpand = () => {
         dispatch({ type: "SET_FACTS_EXPANDED", factsExpanded: !factsExpanded});
     };
 
-    // Get the current playing track once every second
+    const nextFact = async () => {
+        setVisibleIndex((visibleIndex + 1) % facts.choices.length);
+    }
+
+    const prevFact = async () => {
+        setVisibleIndex((visibleIndex - 1 + facts.choices.length) % facts.choices.length); // Adding the length of choices ensures the index stays positive
+    }
+
+    // Switch between lyrics and song facts
+    const footerSwitch = (currentState) => {
+        if (factsOrLyrics !== currentState) {
+            setFactsOrLyrics(!factsOrLyrics);
+        }
+    };
+
+    ////////////  OPEN AI FUNCTIONS  ////////////
+
+    // Make API request to OpenAI whenever facts are expanded or payload changes
+    useEffect(() => {        
+        // Set factsLoading to true
+        dispatch({ type: "SET_FACTS_LOADING", factsLoading: true});
+        
+        // Make a POST request to OpenAI
+        axios({
+            method: "POST",
+            url: "https://api.openai.com/v1/completions",
+            data: payload,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                // "Bearer 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" // Noah's Key
+                "Bearer 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" // Benny's Key
+            }
+        })
+        .then((res) => {
+            // Handle response in helper function
+            console.log("OPEN AI RESPONSE: ", res)
+            responseHandler(res);
+        })
+        .catch((e) => {
+            // If there is an error, set factsLoading to false and log the error message
+            dispatch({ type: "SET_FACTS_LOADING", factsLoading: false});
+            console.log(e.message, e);
+        });
+    }, [payload]);
+
+    // Helper function to handle responses from OpenAI
+    function responseHandler(res) {
+        if (res.status === 200) {
+            // Split response text into a list separated by '<&&>'
+            const pieces = res.data.choices[0].text.split("<&&>");
+
+            // Create an factsect with choices array
+            const result = {
+                choices: pieces
+            };
+
+            setFacts(result);
+            dispatch({ type: "SET_FACTS_LOADING", factsLoading: false });
+        }
+    }
+
+    ////////////  SPOTIFY API: Update Current track  ////////////
+
+    // Repeatedly call the Spotify API to fetch current playing track
     useEffect(() => {
         // Set up a timer to query the Spotify API every second
         const interval = setInterval(() => {
-          spotify.getMyCurrentPlayingTrack().then((response) => {
-            dispatch({
-                type: "SET_CURRENT_TRACK",
-                currentTrack: response?.item
-              });
-            setPayLoad({
-                ...payload,
-                prompt:`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less.
-                Separate each fact with the characters <&&>`
+          spotify.getMyCurrentPlayingTrack()
+            .then(response => {
+                // Only set current track and payload when response received
+                if (response != null) { 
+                    // Check if track has changed
+                    const isTrackDifferent = response?.item.id !== currentTrack?.id;
+                    // If track changed, set currentTrack and payload
+                    if (isTrackDifferent){
+                        
+                        setVisibleIndex(0) // Fact index should start back at beginning
+
+                        dispatch({ type: "SET_CURRENT_TRACK", currentTrack: response?.item});
+                        
+                        setPayLoad({
+                            ...payload,
+                            prompt:`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less.
+                            Separate each fact with the characters <&&>`
+                        });
+                    }
+                }
+            }).catch((error) => {
+                console.error("Error fetching current playing track:", error);
             });
-          });
         }, 1000);
-    
         // Clear timer when the component unmounts
         return () => clearInterval(interval);
-      }, []);
+    }, [currentTrack]);
+
+    ////////////  MUSIC PLAYER FUNCTIONS  ////////////
 
     // Event handler for clicking the play/pause button
     const handlePlayPauseClick = async () => {
@@ -148,7 +201,7 @@ function Footer() {
                     spotify.transferMyPlayback([smartphoneDevice.id], { play: true });
                     dispatch({ type: "SET_PLAYING", isPlaying: true});
                     setIsSmartphoneAvailable(true);
-                    console.log("Playback transferred to smartphone device:", smartphoneDevice);
+                    // console.log("Playback transferred to smartphone device:", smartphoneDevice);
                 } else {
                     console.log("No smartphone device found.");
                     setIsSmartphoneAvailable(false);
@@ -161,25 +214,6 @@ function Footer() {
             });
         }
     };
-
-    // Create divs for facts
-    const factDivs = obj.choices.map((fact, index) => (
-        <div key={index} style={{ display: index === visibleIndex ? 'block' : 'none' }}>
-            {fact}
-        </div>
-    ));
-
-    const pageCircleIcons = [0, 1, 2, 3].map((fact, index) => (
-        <CircleIcon className="fact-box-circle-icon" key={index} style={{ color: index === visibleIndex ? 'white' : 'black' }}/>
-    ));
-
-    const nextFact = async () => {
-        setVisibleIndex((visibleIndex + 1) % obj.choices.length);
-    }
-
-    const prevFact = async () => {
-        setVisibleIndex((visibleIndex - 1) % obj.choices.length);
-    }
 
     // Event handler for Skip Next Button
     const handleSkipNext = async () => {
@@ -247,15 +281,7 @@ function Footer() {
         else {return <RepeatIcon onClick={toggleRepeat} />;}
       };
 
-    // Switch between lyrics and song facts
-    const footerSwitch = (currentState) => {
-        if (factsOrLyrics !== currentState) {
-            setFactsOrLyrics(!factsOrLyrics);
-        }
-    };
-
-    
-    const [lyrics, setLyrics] = useState('');
+    //////////////  GENIUS API CALL   //////////////
 
     useEffect(() => {
         if (factsOrLyrics) {
@@ -309,13 +335,13 @@ function Footer() {
                 <>
                 <div className="footer__switch">
                     <div className="footer__switchLeft" onClick={footerSwitch.bind(this, true)}
-                    style={{ backgroundColor: factsOrLyrics ? '#944816' : '#e87121' }}>
-                    <img src={geniusLogo} alt="" />
-                    Lyrics
+                        style={{ backgroundColor: factsOrLyrics ? '#e87121' : '#944816' }}>
+                        <img src={geniusLogo} alt="" />
+                        Lyrics
                     </div>
                     <div className="footer__switchRight" onClick={footerSwitch.bind(this, false)}
-                    style={{ backgroundColor: factsOrLyrics ? '#e87121' : '#944816' }}>
-                    Song Facts
+                        style={{ backgroundColor: factsOrLyrics ? '#944816' : '#e87121' }}>
+                        Song Facts
                     </div>
                 </div>
                 <div className="footer__boxContainer">
@@ -328,7 +354,7 @@ function Footer() {
                         <div className="fact-box-content">
                             <ArrowCircleLeftIcon fontSize="large" className="left-fact-arrow" onClick={prevFact} />
                             <div className="fact-box-text">{factsLoading ? (
-                                <span>Loading...</span>
+                                <>Loading...</>
                             ) : (
                                 <>
                                     {factDivs}

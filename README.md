@@ -38,3 +38,12 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
 ## v1.6
 - Genius lyrics integration
 - Fixed OpenAI API loading issue
+## v1.7 
+- Basic search bar working!
+## v1.8
+- New facts now load when song changes
+- Footer component annotated and reorganized for readability
+    - The "obj" variable is now called "facts"
+    - Simplified useEffect() function for OpenAI
+- Updated OpenAI key (old one maxed out limit)
+- Fixed bug: fact arrows work going left now
