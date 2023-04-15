@@ -9,12 +9,62 @@
     border-radius: 10px;
 }
 
-.fact-box-content {
+  .fact-box-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80%;
+    width: 100%;
+  }
+
+  .fact-box-buttons {
     display: flex;
     flex-direction: row;
+    /* flex-wrap: wrap; */
+    justify-content: space-between;
+    margin-top: 10px;
+    height: 15%;
+  }
+
+  .fact-box-button {
+    display: flex;
     align-items: center;
-    flex-grow: 9;
-}
+    justify-content: center;
+    background-color: #944816;
+    /* border-color: black; */
+    border-radius: 15px;
+    margin: 2px;
+    width: 23%;
+    height: 15%;
+    color: #fff;
+    cursor: pointer;
+    padding: 15px 15px;
+    font-size: 12apx;
+    font-weight: bold;
+    /* text-transform: uppercase; */
+    /* letter-spacing: 1px; */
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .song-facts {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    font-size: 14px;
+    height: 60%;
+    margin-top: 20%;
+  }
+
+  .fact-box-button.active {
+    background-color: #e87121;
+    color: #fff;
+  }
+
+  .fact-box-text {
+    flex-grow: 1;
+    overflow: auto;
+  }
   
 .left-fact-arrow {
     margin-right: 10px;

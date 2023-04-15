@@ -10,6 +10,7 @@ export const initialState = {
   repeatMode: "off",
   factsExpanded: false,
   factsLoading: false,
+  factType: "basic",
   item: null,
   // remove after finishing the develoment
   // token: "BQBn48goHMW31caaepALlNxTEdTjv9nFzcxsINk9JJWda9yA-4P25LC9lwQxtSyXG5bOr5LDz3MR_zq7GkZ1BIwyGh1fcH9Awu8dGkU4ClH-96Wa4SjB8COhl1_oOVmAmGJyqBJ_L4Sw5TFXF9AtMkWmUJvuIx4fks7tNyrsSvKp-RdT",
@@ -82,6 +83,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         factsLoading: action.factsLoading
+      };
+
+      case "SET_FACT_TYPE":
+      return {
+        ...state,
+        factType: action.factType
       };
 
     case "SET_TOKEN":

@@ -69,6 +69,7 @@
         max-width: 70%;
         color: #1ed15e;
     }
+
 }
 
 @media (max-width: 768px) {
@@ -212,4 +213,7 @@
         color: white;
         font-size: 20px;
     }
+
 }
+
+  

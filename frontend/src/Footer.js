@@ -35,15 +35,16 @@ const ColoredSlider = withStyles({
     },
   })(Slider);
 
-function Footer() {
+function Footer(props) {
     // State Variables
     const [isSmartphoneAvailable, setIsSmartphoneAvailable] = useState(true);
     const [visibleIndex, setVisibleIndex] = useState(0);
     const [factsOrLyrics, setFactsOrLyrics] = useState(false);
+    const [activeFactButton, setActiveFactButton] = useState(null);
     // const [loading, setLoading] = useState(false);
 
     // Get global variables
-    const [{ spotify, currentTrack, isPlaying, isShuffling, repeatMode, factsExpanded, factsLoading }, dispatch] = useDataLayerValue();
+    const [{ spotify, currentTrack, isPlaying, isShuffling, repeatMode, factsExpanded, factsLoading, factType }, dispatch] = useDataLayerValue();
     const isMobile = useMediaQuery('(max-width:600px)');
 
     // OpenAI API
@@ -58,6 +59,11 @@ function Footer() {
         max_tokens: 400
     });
 
+    const handleFactButtonClick = (buttonName) => {
+        setActiveFactButton(buttonName);
+        dispatch({ type: "SET_FACT_TYPE", factType: buttonName });
+      };
+
     useEffect(() => {
         const getRes = async () => {
                 dispatch({ type: "SET_FACTS_LOADING", factsLoading: true});
@@ -68,7 +74,9 @@ function Footer() {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization:
-                        "Bearer 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"
+                        // "Bearer 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"
+                        "Bearer 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" // Andrew's Key
+
                     }
                 })
                 .then((res) => {
@@ -83,7 +91,7 @@ function Footer() {
         if (factsExpanded) {
             getRes();
         }
-    }, [factsExpanded]);
+    }, [factsExpanded, factType]);
 
     function responseHandler(res) {
         if (res.status === 200) {
@@ -108,21 +116,59 @@ function Footer() {
         // Set up a timer to query the Spotify API every second
         const interval = setInterval(() => {
           spotify.getMyCurrentPlayingTrack().then((response) => {
+            console.log(factType);
             dispatch({
                 type: "SET_CURRENT_TRACK",
                 currentTrack: response?.item
               });
-            setPayLoad({
+              if(factType === "basic"){
+                setPayLoad({
                 ...payload,
                 prompt:`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less.
                 Separate each fact with the characters <&&>`
-            });
+                });
+              }
+              else if(factType === "Background"){
+                setPayLoad({
+                    ...payload,
+                    prompt:`Please write four facts about the background and insiration for the song ${response?.item.name} by ${response?.item.artists[0].name}, 
+                    with each fact being 200 characters or less. Separate each fact with the characters <&&>`
+                });
+              }
+              else if(factType === "Band Members"){
+                setPayLoad({
+                    ...payload,
+                    prompt:`Please write four facts about the members of the band that plays the song ${response?.item.name} by ${response?.item.artists[0].name}, 
+                    with each fact being 200 characters or less. Separate each fact with the characters <&&>`
+                });
+              }
+              else if(factType === "Discography"){
+                setPayLoad({
+                    ...payload,
+                    prompt:`Please write four facts about the other discography of the band that plays the song ${response?.item.name} by ${response?.item.artists[0].name}, 
+                    with each fact being 200 characters or less. Separate each fact with the characters <&&>`
+                });
+              }
+              else if(factType === "Recording"){
+                setPayLoad({
+                    ...payload,
+                    prompt:`Please write four facts about the recording and mixing of the song ${response?.item.name} by ${response?.item.artists[0].name}, 
+                    with each fact being 200 characters or less. Separate each fact with the characters <&&>`
+                });
+              }
+              else{
+                setPayLoad({
+                    ...payload,
+                    prompt:`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less.
+                    Separate each fact with the characters <&&>`
+                });
+              }
           });
         }, 1000);
     
         // Clear timer when the component unmounts
         return () => clearInterval(interval);
-      }, []);
+      }, [factType]);
 
     // Event handler for clicking the play/pause button
     const handlePlayPauseClick = async () => {
@@ -326,15 +372,61 @@ function Footer() {
                         ) : (
                         <>
                         <div className="fact-box-content">
-                            <ArrowCircleLeftIcon fontSize="large" className="left-fact-arrow" onClick={prevFact} />
-                            <div className="fact-box-text">{factsLoading ? (
-                                <span>Loading...</span>
-                            ) : (
-                                <>
-                                    {factDivs}
-                                </>
-                            )}</div>
-                            <ArrowCircleRightIcon fontSize="large" className="right-fact-arrow" onClick={nextFact} />
+
+                            <div className="fact-box-buttons">
+                                <div className = "fact-box-buttons">
+                                    <button
+                                        className={`fact-box-button ${
+                                        activeFactButton === "Background" ? "active" : ""
+                                        }`}
+                                        onClick={() => handleFactButtonClick("Background")}
+                                    >
+                                        Background
+                                    </button>
+                                    <button
+                                        className={`fact-box-button ${
+                                        activeFactButton === "Band Members" ? "active" : ""
+                                        }`}
+                                        onClick={() => handleFactButtonClick("Band Members")}
+                                    >
+                                        Band Members
+                                    </button>
+                                    <button
+                                        className={`fact-box-button ${
+                                        activeFactButton === "Discography" ? "active" : ""
+                                        }`}
+                                        onClick={() => handleFactButtonClick("Discography")}
+                                    >
+                                        Discography
+                                    </button>
+                                    <button
+                                        className={`fact-box-button ${
+                                        activeFactButton === "Recording" ? "active" : ""
+                                        }`}
+                                        onClick={() => handleFactButtonClick("Recording")}
+                                    >
+                                        Recording
+                                    </button>
+                                </div>
+                                <div className="fact-box-text">
+                                    {activeFactButton === "Background" && <p>{props.background}</p>}
+                                    {activeFactButton === "Band Members" && <p>{props.bandMembers}</p>}
+                                    {activeFactButton === "Discography" && <p>{props.discography}</p>}
+                                    {activeFactButton === "Recording" && <p>{props.recording}</p>}
+                                </div>
+                            </div>
+                            
+                            <div className= "song-facts">
+                                <ArrowCircleLeftIcon fontSize="large" className="left-fact-arrow" onClick={prevFact} />
+                                <div className="fact-box-text">{factsLoading ? (
+                                    <span>Loading...</span>
+                                ) : (
+                                    <>
+                                        {factDivs}
+                                    </>
+                                )}</div>
+                                <ArrowCircleRightIcon fontSize="large" className="right-fact-arrow" onClick={nextFact} />
+                            </div>
                         </div>
                         <div className="fact-box-pagination">
                             {pageCircleIcons}
