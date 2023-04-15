@@ -7,6 +7,8 @@ const clientId = "b176c89eb06a4faebc76fafc5dda1dca"
 // const redirectUri = "https://dev.dzzacllm3y2z3.amplifyapp.com/";
 const redirectUri = "http://localhost:3000"
 
+// const redirectUri = "https://dev.dzzacllm3y2z3.amplifyapp.com/"; // Old development link
+// const redirectUri = "https://prod.d3qvw67p73klfr.amplifyapp.com/"; // New production link
 const scopes = [
     "user-read-currently-playing",
     "user-read-recently-played",
