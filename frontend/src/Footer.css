@@ -80,7 +80,7 @@
         flex-direction: column;
         justify-content: space-around;
         bottom: 0;
-        height:fit-content;
+        height: 20vh;
         width: 100vw;
         max-height: 20vh;
         padding: 15px;
@@ -214,6 +214,9 @@
         font-size: 20px;
     }
 
+    .footer__lyricsBox::-webkit-scrollbar {
+        display: none;
+      }
 }
 
   

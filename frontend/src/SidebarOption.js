@@ -5,12 +5,13 @@ import { useDataLayerValue } from './DataLayer';
 
 // Parameters: title, icon, and playlist id
 // Only playlists will be passed 'id'
-function SidebarOption({ title, Icon, id }) {
+function SidebarOption({ title, Icon, id, onOptionClick }) {
     const [ { spotify }, dispatch] = useDataLayerValue();
 
     // Event handler for clicking a 'sidebarOption'
     const handleClick = () => {
-        console.log("Sidebar Option clicked!");
+        console.log(`Sidebar Option ${title} clicked!`);
+        onOptionClick(title);
         
         // Only run this code for playlists (if 'id' has been passed)
         if (spotify && id){

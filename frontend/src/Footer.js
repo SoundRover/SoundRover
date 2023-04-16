@@ -53,16 +53,8 @@ function Footer(props) {
     let [lastFactType, setLastFactType] = useState("basic");
 
     // Payload to send to OpenAI in request
-    const [payload, setPayLoad] = useState({
-        prompt: currentTrack ? `Please write four facts about the song ${currentTrack.name} by ${currentTrack.artists[0].name}, with each fact being 200 characters or less.
-        Separate each fact with the characters <&&>` : 'Please write the text "Loading..."',
-
-        temperature: 0.5,
-        n: 1,
-        model: "text-davinci-003", 
-        max_tokens: 400
-    });
-
+    const [payload, setPayLoad] = useState(currentTrack ? `Please write four facts about the song ${currentTrack.name} by ${currentTrack.artists[0].name}, with each fact being 200 characters or less.
+    Don't number the facts in any way. Separate each fact with the characters <&&>` : `Loading...`);
 
     const handleFactButtonClick = (buttonName) => {
         setActiveFactButton(buttonName);
@@ -106,49 +98,50 @@ function Footer(props) {
     ////////////  OPEN AI FUNCTIONS  ////////////
 
     // Make API request to OpenAI whenever facts are expanded or payload changes
-    useEffect(() => {        
+    useEffect(async () => {        
         // Set factsLoading to true
         dispatch({ type: "SET_FACTS_LOADING", factsLoading: true});
-        
-        // Make a POST request to OpenAI
-        axios({
-            method: "POST",
-            url: "https://api.openai.com/v1/completions",
-            data: payload,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization:
-                // "Bearer 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" // Noah's Key
-                // "Bearer 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" // Benny's Key
-                "Bearer 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" //Andrew's Key
+
+        if (payload != "Loading...") {
+            const { Configuration, OpenAIApi } = require("openai");
+
+            const configuration = new Configuration({
+            apiKey: "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", // Noah's Key
+            });
+            delete configuration.baseOptions.headers['User-Agent'];
+            const openai = new OpenAIApi(configuration);
+
+            console.log(payload);
+
+            try {
+                const completion = await openai.createChatCompletion({
+                model: "gpt-3.5-turbo",
+                messages: [{role: "user", content: payload}],
+                });
+                console.log(completion.data.choices[0].message);
+                responseHandler(completion.data.choices[0].message);
+            } catch(err) {
+                console.log(err);
             }
-        })
-        .then((res) => {
-            // Handle response in helper function
-            console.log("OPEN AI RESPONSE: ", res)
-            responseHandler(res);
-        })
-        .catch((e) => {
-            // If there is an error, set factsLoading to false and log the error message
-            dispatch({ type: "SET_FACTS_LOADING", factsLoading: false});
-            console.log(e.message, e);
-        });
+        } else {
+            responseHandler(payload);
+        }
     }, [payload]);
 
     // Helper function to handle responses from OpenAI
     function responseHandler(res) {
-        if (res.status === 200) {
-            // Split response text into a list separated by '<&&>'
-            const pieces = res.data.choices[0].text.split("<&&>");
+        // Split response text into a list separated by '<&&>'
+        const pieces = res.content.split("<&&>");
 
-            // Create an factsect with choices array
-            const result = {
-                choices: pieces
-            };
+        // Create an factsect with choices array
+        const result = {
+            choices: pieces
+        };
 
-            setFacts(result);
-            dispatch({ type: "SET_FACTS_LOADING", factsLoading: false });
-        }
+        console.log(result);
+
+        setFacts(result);
+        dispatch({ type: "SET_FACTS_LOADING", factsLoading: false });
     }
 
     ////////////  SPOTIFY API: Update Current track  ////////////
@@ -165,46 +158,28 @@ function Footer(props) {
                     if (factType != lastFactType){
                         setLastFactType(factType);
                         if(factType === "basic"){
-                        setPayLoad({
-                        ...payload,
-                        prompt:`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less.
-                        Separate each fact with the characters <&&>`
-                        });
+                        setPayLoad(`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less.
+                        Assume I already know what album it is on and what year it was made. Don't number the facts in any way. Separate each fact with the characters <&&>`);
                       }
                       else if(factType === "Background"){
-                        setPayLoad({
-                            ...payload,
-                            prompt:`Please write four facts about the background and insiration for the song ${response?.item.name} by ${response?.item.artists[0].name}, 
-                            with each fact being 200 characters or less. Separate each fact with the characters <&&>`
-                        });
+                        setPayLoad(`Please write four facts about the background and insiration for the song ${response?.item.name} by ${response?.item.artists[0].name}, 
+                            with each fact being 200 characters or less. Assume I already know what album it is on and what year it was made. Don't number the facts in any way. Separate each fact with the characters <&&>`);
                       }
                       else if(factType === "Band Members"){
-                        setPayLoad({
-                            ...payload,
-                            prompt:`Please write four facts about the members of the band that plays the song ${response?.item.name} by ${response?.item.artists[0].name}, 
-                            with each fact being 200 characters or less. Separate each fact with the characters <&&>`
-                        });
+                        setPayLoad(`Please write four facts about the members of the band that plays the song ${response?.item.name} by ${response?.item.artists[0].name}, 
+                            with each fact being 200 characters or less. Assume I already know what album it is on and what year it was made. Don't number the facts in any way. Separate each fact with the characters <&&>`);
                       }
                       else if(factType === "Discography"){
-                        setPayLoad({
-                            ...payload,
-                            prompt:`Please write four facts about the other discography of the band that plays the song ${response?.item.name} by ${response?.item.artists[0].name}, 
-                            with each fact being 200 characters or less. Separate each fact with the characters <&&>`
-                        });
+                        setPayLoad(`Please write four facts about the other discography of the band that plays the song ${response?.item.name} by ${response?.item.artists[0].name}, 
+                            with each fact being 200 characters or less. Assume I already know what album it is on and what year it was made. Don't number the facts in any way. Separate each fact with the characters <&&>`);
                       }
                       else if(factType === "Recording"){
-                        setPayLoad({
-                            ...payload,
-                            prompt:`Please write four facts about the recording and mixing of the song ${response?.item.name} by ${response?.item.artists[0].name}, 
-                            with each fact being 200 characters or less. Separate each fact with the characters <&&>`
-                        });
+                        setPayLoad(`Please write four facts about the recording and mixing of the song ${response?.item.name} by ${response?.item.artists[0].name}, 
+                            with each fact being 200 characters or less. Assume I already know what album it is on and what year it was made. Don't number the facts in any way. Separate each fact with the characters <&&>`);
                       }
                       else{
-                        setPayLoad({
-                            ...payload,
-                            prompt:`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less.
-                            Separate each fact with the characters <&&>`
-                        });
+                        setPayLoad(`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less. 
+                        Assume I already know what album it is on and what year it was made. Don't number the facts in any way. Separate each fact with the characters <&&>`);
                       }
                     }
                     
@@ -217,11 +192,8 @@ function Footer(props) {
 
                         dispatch({ type: "SET_CURRENT_TRACK", currentTrack: response?.item});
                         
-                        setPayLoad({
-                            ...payload,
-                            prompt:`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less.
-                            Separate each fact with the characters <&&>`
-                        });
+                        setPayLoad(`Please write four facts about the song ${response?.item.name} by ${response?.item.artists[0].name}, with each fact being 200 characters or less.
+                        Assume I already know what album it is on and what year it was made. Separate each fact with the characters <&&>`);
                     }
                 }
             }).catch((error) => {
@@ -517,9 +489,9 @@ function Footer(props) {
             <div className="footer__mobile__sidebar">
             {isMobile && (
                 <>
-                    <SidebarOption Icon={HomeIcon} className="mobile-icon" />
-                    <SidebarOption Icon={SearchIcon} className="mobile-icon" />
-                    <SidebarOption Icon={LibraryMusicIcon} className="mobile-icon" />
+                    <SidebarOption Icon={HomeIcon} className="mobile-icon" title="Home" onOptionClick={props.onOptionClick} />
+                    <SidebarOption Icon={SearchIcon} className="mobile-icon" title="Search" onOptionClick={props.onOptionClick} />
+                    <SidebarOption Icon={LibraryMusicIcon} className="mobile-icon" title="Your Library" onOptionClick={props.onOptionClick} />
                 </>
             )}
             </div>

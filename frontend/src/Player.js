@@ -7,6 +7,9 @@ import Footer from './Footer';
 function Player() {
   const [isDesktop, setIsDesktop] = useState(true);
 
+  // Sidebar option state variable
+  const [activeOption, setActiveOption] = useState('Home');
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 768) {
@@ -26,10 +29,10 @@ function Player() {
   return (
     <div className="player">
       <div className="player__body">
-        {isDesktop && <Sidebar />}
-        <Body />
+        {isDesktop && <Sidebar onOptionClick={setActiveOption}/>}
+        <Body activeOption={activeOption} />
       </div>
-      <Footer />
+      <Footer onOptionClick={setActiveOption} />
     </div>
   );
 }

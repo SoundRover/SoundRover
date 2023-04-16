@@ -1,10 +1,12 @@
 .sidebarOption {
     display: flex;
+    flex-direction: column;
     cursor: pointer;
     align-items: center;
     height: 40px;
     color: grey;
     transition: 200ms color ease-in;
+    width: 30%;
 }
   
 .sidebarOption:hover {

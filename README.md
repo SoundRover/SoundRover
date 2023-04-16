@@ -47,3 +47,8 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
     - Simplified useEffect() function for OpenAI
 - Updated OpenAI key (old one maxed out limit)
 - Fixed bug: fact arrows work going left now
+## v1.9
+- Changed OpenAI API calls to use "gpt-3.5-turbo" model from "text-davinci-003"
+- Added functionality for bottom page buttons (Home, Search, Your Library)
+- Changed layout of search
+- Minor UI tweaks

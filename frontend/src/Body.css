@@ -6,6 +6,7 @@
     color: white;
     background: linear-gradient(transparent, rgba(0, 0, 0, 1));
     background-color: #e87121;
+    height: 80vh;
 }
   
 .body::-webkit-scrollbar {
@@ -71,6 +72,14 @@
   
 .body__infoText > p {
     font-size: 14px;
+}
+
+.home_header {
+    text-align: center;
+}
+
+.home_logo {
+    width: 100%;
 }
 
 @media (max-width: 768px) {
