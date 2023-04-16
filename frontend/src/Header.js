@@ -3,8 +3,9 @@ import './Header.css';
 import SearchIcon from "@material-ui/icons/Search";
 import { Avatar } from '@material-ui/core';
 import { useDataLayerValue } from './DataLayer';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-function Header({ activeOption }) {
+function Header({ activeOption, arrowClick, showPlaylistList }) {
 
     const [{ user }] = useDataLayerValue();
     const [showMenu, setShowMenu] = useState(false);
@@ -103,7 +104,12 @@ function Header({ activeOption }) {
                 );
             case 'Your Library':
                 return (
-                    <div className="header">
+                    <div className="header__library">
+                        {showPlaylistList ? (
+                            <h2>Playlists</h2>
+                        ) : (
+                            <ArrowBackIcon className="backIcon" onClick={arrowClick} />
+                        )}
                         <div className="header__right" onClick={toggleMenu}>
                             <Avatar src={user?.images[0] && user?.images[0].url} alt={user?.display_name} />
                             <h4>{user?.display_name}</h4>

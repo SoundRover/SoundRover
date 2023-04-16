@@ -15,8 +15,7 @@ function SongRow({ track }) {
     // Queue song upon double click (immediate playback is not available on spotify web api)
     async function handleDoubleClick() {
         if (!isMobile){
-            await spotify.queue(`spotify:track:${track.id}`)
-            spotify.skipToNext();
+            await spotify.play({ uris: [track.uri], });
             console.log("Song double clicked!");
         }
     }
@@ -25,8 +24,7 @@ function SongRow({ track }) {
     // Queue song upon single tap
     async function handleClick() {
         if (isMobile){
-            await spotify.queue(`spotify:track:${track.id}`)
-            spotify.skipToNext();
+            await spotify.play({ uris: [track.uri], });
             console.log("Song tapped!");
         }
     }

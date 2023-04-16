@@ -6,6 +6,15 @@
     gap: 10px;
     margin-bottom: 30px;
 }
+
+.header__library {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 30px;
+}
   
 .header__right {
     display: flex;
@@ -76,4 +85,8 @@
     margin: 0;
     font-size: 14px;
     color: rgb(90, 90, 90);
+  }
+
+  .backIcon {
+    transform: scale(1.5);
   }

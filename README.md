@@ -52,3 +52,9 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
 - Added functionality for bottom page buttons (Home, Search, Your Library)
 - Changed layout of search
 - Minor UI tweaks
+## v1.10
+- Added view of user's playlists in "Your Library" tab
+- Clicking a playlist name allows you to view the playlist
+- Clicking the large play button at the top of a playlist plays the first song and queues all remaining songs in the playlist
+- Clicking the back button in a playlist view takes the user back to the list of playlists
+- Fixed logic for playing songs to play songs immediately instead of queuing and then skipping to next
