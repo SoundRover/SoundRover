@@ -58,3 +58,5 @@ Contains some demos on how to use some of the Spotipy API funcitonality.
 - Clicking the large play button at the top of a playlist plays the first song and queues all remaining songs in the playlist
 - Clicking the back button in a playlist view takes the user back to the list of playlists
 - Fixed logic for playing songs to play songs immediately instead of queuing and then skipping to next
+## v1.10.1
+- Added openai package dependency
