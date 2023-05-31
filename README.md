@@ -1,12 +1,16 @@
 # Sound Rover
 
-Sound Rover is a music player that presents interesting song facts and lyrics about the currently playing song to create a more interactive listening experience. Sound Rover works by...
+Sound Rover is a music player that presents interesting facts about songs and artists to create a more engaging listening experience. Sound Rover works by...
 
 1. connecting to your Spotify library and conducting music playback via the Spotify Web API
 2. collecting information about the current playing song from Wikipedia
 3. extracting interesting facts from the Wikipedia content and rephrasing for better readability using OpenAI's GPT-3.5
 
 We combine the linguistic synthesizing capabilities of large language models with more trusted sources of information about artists.  
+
+![Sound Rover](/soundrover-images/cover.png "Sound Rover")
+
+![View of playlist and song facts](/soundrover-images/playlist-facts.png "View of playlist and song facts")
 
 **Team Members**: Andrew Mastruserio, Benny Craig, Noah McCreery, and Ruizhen Hu
 
