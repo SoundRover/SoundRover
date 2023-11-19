@@ -1,6 +1,9 @@
 # stores Spotify user credentials
 cred.py
 
+# stores OpenAI API Key
+.env
+
 # Project dependencies
 frontend/node_modules/
 
