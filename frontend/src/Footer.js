@@ -106,7 +106,7 @@ function Footer(props) {
             const { Configuration, OpenAIApi } = require("openai");
 
             const configuration = new Configuration({
-            apiKey: "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", // Noah's Key
+                apiKey: process.env.OPENAI_API_KEY// using environment variable
             });
             delete configuration.baseOptions.headers['User-Agent'];
             const openai = new OpenAIApi(configuration);
